@@ -9,5 +9,5 @@ new Vue({
   render: (h) => h(App),
 }).$mount('#app');
 
-func(message1);
-func(message2);
+// func(message1);
+// func(message2);
