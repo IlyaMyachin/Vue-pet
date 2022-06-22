@@ -6,7 +6,7 @@
 
 
 <script>
-import ProductItem from "./ProductItem.vue";
+import ProductItem from "./ProductItem";
 
 export default {
   props: ['products'],

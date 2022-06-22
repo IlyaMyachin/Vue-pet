@@ -1,13 +1,14 @@
 import Vue from 'vue';
 import App from './App.vue';
-import { message1, message2 } from './data-1';
-import func from './data-2';
+import router from "./router";
+import store from "./store";
 
 Vue.config.productionTip = false;
 
 new Vue({
+  router,
+  store,
   render: (h) => h(App),
 }).$mount('#app');
 
-// func(message1);
-// func(message2);
+
