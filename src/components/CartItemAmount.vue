@@ -19,7 +19,6 @@
 <script>
 export default {
   props: ["itemAmount"],
-
   methods: {
     removeOneProduct() {
       if (this.currentItemAmount > 1) {
@@ -39,6 +38,9 @@ export default {
         return this.itemAmount;
       },
       set(value) {
+        if(value < 1) {
+          value = 1
+        }
         return this.$emit('update:itemAmount', value)
       }
     }

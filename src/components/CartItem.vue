@@ -10,23 +10,7 @@
     <span class="product__code">
       Артикул: {{ item.product.id }}
     </span>
-
-    <div class="form__counter">
-      <button type="button" aria-label="Убрать один товар" @click.prevent="removeOneProduct">
-        <svg width="12" height="12" fill="currentColor">
-          <use xlink:href="#icon-minus"></use>
-        </svg>
-      </button>
-
-      <input type="text" v-model.number="amount" name="count">
-
-      <button type="button" aria-label="Добавить один товар" @click.prevent="addOneProduct">
-        <svg width="12" height="12" fill="currentColor">
-          <use xlink:href="#icon-plus"></use>
-        </svg>
-      </button>
-    </div>
-
+      <CartItemAmount :item-amount.sync="amount"/>
     <b class="product__price">
       {{ item.product.price * item.amount | numberFormat }} ₽
     </b>
@@ -42,9 +26,11 @@
 
 <script>
 import numberFormat from '@/helpers/numberFormat'
+import CartItemAmount from '@/components/CartItemAmount';
 
 export default {
   props: ["item"],
+  components: {CartItemAmount},
   filters: { numberFormat },
   computed: {
     amount: {
