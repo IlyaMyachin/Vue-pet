@@ -1,7 +1,7 @@
 <template>
   <div>
     <main v-if="productLoading">Загрузка товара...</main>
-    <main v-else-if="prodctLoadingFailed">Ошибка загрузки товара</main>
+    <main v-else-if="!productData">Ошибка загрузки товара</main>
     <main v-else class="content container">
       <div class="content__top">
         <ul class="breadcrumbs">
