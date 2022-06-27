@@ -1,8 +1,7 @@
 <template>
   <li class="cart__item product">
     <div class="product__pic">
-      <img :src="item.product.image" width="120" height="120" srcset="img/phone-square-3@2x.jpg 2x"
-        :alt="item.product.title">
+      <img :src="item.image" width="120" height="120" srcset="img/phone-square-3@2x.jpg 2x" :alt="item.product.title">
     </div>
     <h3 class="product__title">
       {{ item.product.title }}
@@ -10,13 +9,13 @@
     <span class="product__code">
       Артикул: {{ item.product.id }}
     </span>
-      <CartItemAmount :item-amount.sync="amount"/>
+    <CartItemAmount :item-amount.sync="amount" />
     <b class="product__price">
       {{ item.product.price * item.amount | numberFormat }} ₽
     </b>
 
     <button class="product__del button-del" type="button" aria-label="Удалить товар из корзины"
-    @click.prevent="deleteProduct(item.productId)">
+      @click.prevent="deleteProduct()">
       <svg width="20" height="20" fill="currentColor">
         <use xlink:href="#icon-close"></use>
       </svg>
@@ -30,7 +29,7 @@ import CartItemAmount from '@/components/CartItemAmount';
 
 export default {
   props: ["item"],
-  components: {CartItemAmount},
+  components: { CartItemAmount },
   filters: { numberFormat },
   computed: {
     amount: {
@@ -38,7 +37,7 @@ export default {
         return this.item.amount;
       },
       set(value) {
-        this.$store.commit("updateCartProductAmount", { productId: this.item.productId, amount: value });
+        this.$store.dispatch("updateCartProductAmount", { productId: this.item.productId, amount: value });
       }
     }
   },
@@ -54,8 +53,8 @@ export default {
     addOneProduct() {
       return this.amount++
     },
-    deleteProduct(productId) {
-      this.$store.commit('deleteCartProduct', productId)
+    deleteProduct() {
+      this.$store.dispatch('deleteCartProduct', { productId: this.item.productId })
     }
   }
 }

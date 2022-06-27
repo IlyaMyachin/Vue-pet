@@ -1,5 +1,5 @@
 <template>
- <main class="content container">
+  <main class="content container">
 
     <div class="content__top content__top--catalog">
       <h1 class="content__title">
@@ -11,9 +11,12 @@
     </div>
 
     <div class="content__catalog">
-      <ProductFilter :price-from.sync="filterPriceFrom" :price-to.sync="filterPriceTo" :category-id.sync="filterPriceCategoryId" :color-pick.sync="filterColor"/>
+      <ProductFilter :price-from.sync="filterPriceFrom" :price-to.sync="filterPriceTo"
+        :category-id.sync="filterCategoryId" :color-pick.sync="filterColor" />
       <section class="catalog">
-        <ProductList :products="products"/>
+        <div v-if="productsLoading">Загрузка товаров...</div>
+        <div v-else-if="productsLoadingFailed">При загрузке произошла ошибка.<button @click.prevent="loadProducts()">Попробовать еще раз?</button></div>
+        <ProductList :products="products" />
         <BasePagination v-model="page" :count="countProducts" :per-page="productsPerPage" />
       </section>
     </div>
@@ -22,10 +25,11 @@
 </template>
 
 <script>
-import products from '@/data/products'
 import ProductList from "@/components/ProductList";
 import BasePagination from '@/components/BasePagination';
 import ProductFilter from '@/components/ProductFilter';
+import axios from 'axios';
+import { API_BASE_URL } from "@/config";
 
 export default {
   components: { ProductList, BasePagination, ProductFilter },
@@ -33,42 +37,73 @@ export default {
     return {
       filterPriceFrom: 0,
       filterPriceTo: 0,
-      filterPriceCategoryId: 0,
-      filterColor: '',
+      filterCategoryId: 0,
+      filterColor: 0,
       page: 1,
       productsPerPage: 3,
+      productsData: null,
+      productsLoading: false,
+      productsLoadingFailed: false,
     }
   },
   computed: {
-    filteredProducts() {
-      let filteredProducts = products;
-
-      if (this.filterPriceFrom > 0) {
-        filteredProducts = filteredProducts.filter(product => product.price > this.filterPriceFrom);
-      }
-
-      if (this.filterPriceTo > 0) {
-        filteredProducts = filteredProducts.filter(product => product.price < this.filterPriceTo);
-      }
-
-      if (this.filterPriceCategoryId) {
-        filteredProducts = filteredProducts.filter(product => product.categoryId === this.filterPriceCategoryId);
-      }
-
-      if (this.filterColor) {
-        filteredProducts = filteredProducts.filter(product => product.colors.some(color => color === this.filterColor))
-      }
-
-      return filteredProducts
-    },
     products() {
-      const offset = (this.page - 1) * this.productsPerPage;
-      return this.filteredProducts.slice(offset, offset + this.productsPerPage)
+      return this.productsData ? this.productsData.items.map(item => {
+        return {
+          ...item,
+          image: item.image.file.url,
+          colors: item.colors.map(color => {
+            return color.code
+          })
+        }
+      }) : [];
     },
     countProducts() {
-      return this.filteredProducts.length
+      return this.productsData ? this.productsData.pagination.total : 0;
     }
   },
+  methods: {
+    loadProducts() {
+      this.productsLoading = true;
+      this.productsLoadingFailed = false,
+      clearTimeout(this.loadProductsTimer);
+      this.loadProductsTimer = setTimeout(() => {
+        return axios.get(API_BASE_URL + '/api/products', {
+          params: {
+            page: this.page,
+            limit: this.productsPerPage,
+            categoryId: this.filterCategoryId,
+            minPrice: this.filterPriceFrom,
+            maxPrice: this.filterPriceTo,
+            colorId: this.filterColor,
+          }
+        })
+          .then(response => this.productsData = response.data)
+          .catch(() => this.productsLoadingFailed = true)
+          .then(() => this.productsLoading = false);
+      }, 0)
+    },
+  },
+  watch: {
+    page() {
+      this.loadProducts();
+    },
+    filterCategoryId() {
+      this.loadProducts();
+    },
+    filterPriceFrom() {
+      this.loadProducts();
+    },
+    filterPriceTo() {
+      this.loadProducts();
+    },
+    filterColor() {
+      this.loadProducts();
+    }
+  },
+  created() {
+    this.loadProducts()
+  }
 };
 </script>
 
