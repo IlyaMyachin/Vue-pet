@@ -229,9 +229,6 @@ export default {
           .then(() => this.productLoading = false);
     }
   },
-  created() {
-    this.loadProduct()
-  },
   watch: {
     '$route.params.id': {
       handler() {

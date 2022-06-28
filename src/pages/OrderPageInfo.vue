@@ -20,13 +20,13 @@
         </li>
       </ul>
 
-      <h1 class="content__title">
+      <h1 v-if="orderInfo" class="content__title">
         Заказ оформлен <span>№ {{ orderInfo.id }}</span>
       </h1>
     </div>
 
     <section class="cart">
-      <form class="cart__form form" action="#" method="POST">
+      <form v-if="orderInfo" class="cart__form form" action="#" method="POST">
         <div class="cart__field">
           <p class="cart__message">
             Благодарим за&nbsp;выбор нашего магазина. На&nbsp;Вашу почту придет письмо с&nbsp;деталями заказа.
@@ -89,7 +89,6 @@
 import OrderProductsList from '@/components/OrderProductsList'
 import { mapActions, mapGetters } from 'vuex';
 
-
 export default {
   components: { OrderProductsList },
   computed: {
@@ -102,11 +101,16 @@ export default {
   methods: {
     ...mapActions(['loadOrderInfo'])
   },
-  created() {
-    if (this.$store.state.orderInfo && this.$store.state.orderInfo.id === this.$route.params.id) {
-      return
+  watch: {
+    '$route.params.id': {
+      handler() {
+        if (this.$store.state.orderInfo && this.$store.state.orderInfo.id === this.$route.params.id) {
+          return
+        }
+        this.loadOrderInfo(this.$route.params.id);
+      },
+      immediate: true
     }
-    this.loadOrderInfo(this.$route.params.id)
   }
 }
 </script>
