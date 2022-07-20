@@ -1,4 +1,4 @@
-# skillbox
+# Vue-pet
 
 ## Project setup
 ```
